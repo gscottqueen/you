@@ -1,9 +1,31 @@
-
-const body = document.getElementById('you');
+// require('@tensorflow/tfjs-backend-webgl');
+// const faceLandmarksDetection = require('@tensorflow-models/face-landmarks-detection');
+const canvasSketch = require('canvas-sketch');
 const video = document.querySelector('video');
-const canvas = document.querySelector('canvas');
 let streamStarted = false;
 
+// start canvas sketch
+
+const settings = {
+  dimensions: [ 1080, 1080 ],
+};
+
+const sketch = () => {
+  return ({ context, width, height }) => {
+    context.fillStyle = 'white';
+    context.fillRect(0, 0, width, height);
+  };
+};
+
+canvasSketch(sketch, settings);
+
+
+// check for device support
+if ('mediaDevices' in navigator && 'getUserMedia' in navigator.mediaDevices) {
+  console.log("Let's get this party started")
+}
+
+// get user permission and access Media Devices object
 async function generateMesh() {
   const model = await faceLandmarksDetection.load(
       faceLandmarksDetection.SupportedPackages.mediapipeFacemesh);
@@ -12,6 +34,7 @@ async function generateMesh() {
   });
 
 if (predictions.length > 0) {
+console.log(predictions)
     /*
     `predictions` is an array of objects describing each detected face, for example:
 
@@ -50,19 +73,13 @@ if (predictions.length > 0) {
       for (let i = 0; i < keypoints.length; i++) {
         const [x, y, z] = keypoints[i];
 
-        // console.log(`Keypoint ${i}: [${x}, ${y}, ${z}]`);
+        console.log(`Keypoint ${i}: [${x}, ${y}, ${z}]`);
         // plot points on a canvas
       }
     }
   }
 }
 
-// check for device support
-if ('mediaDevices' in navigator && 'getUserMedia' in navigator.mediaDevices) {
-  console.log("Let's get this party started")
-}
-
-// get user permission and access Media Devices object
 navigator.mediaDevices.getUserMedia({
   video: {
     width: {
@@ -81,9 +98,8 @@ navigator.mediaDevices.getUserMedia({
   /* use the stream */
   video.srcObject = stream;
   streamStarted = true;
-  console.log(stream, streamStarted)
+  console.log("stream", stream, "stream started", streamStarted)
   generateMesh();
 }).catch( err => {
   console.log(err)
 });
-
