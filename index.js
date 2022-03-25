@@ -4,7 +4,7 @@ const video = document.querySelector('video');
 const canvas = document.querySelector('canvas');
 let streamStarted = false;
 
-async function main() {
+async function generateMesh() {
   const model = await faceLandmarksDetection.load(
       faceLandmarksDetection.SupportedPackages.mediapipeFacemesh);
   const predictions = await model.estimateFaces({
@@ -82,7 +82,7 @@ navigator.mediaDevices.getUserMedia({
   video.srcObject = stream;
   streamStarted = true;
   console.log(stream, streamStarted)
-  main();
+  generateMesh();
 }).catch( err => {
   console.log(err)
 });
