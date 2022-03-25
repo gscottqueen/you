@@ -1,7 +1,61 @@
+
 const body = document.getElementById('you');
 const video = document.querySelector('video');
 const canvas = document.querySelector('canvas');
 let streamStarted = false;
+
+async function main() {
+  const model = await faceLandmarksDetection.load(
+      faceLandmarksDetection.SupportedPackages.mediapipeFacemesh);
+  const predictions = await model.estimateFaces({
+    input: document.querySelector("video")
+  });
+
+if (predictions.length > 0) {
+    /*
+    `predictions` is an array of objects describing each detected face, for example:
+
+    [
+      {
+        faceInViewConfidence: 1, // The probability of a face being present.
+        boundingBox: { // The bounding box surrounding the face.
+          topLeft: [232.28, 145.26],
+          bottomRight: [449.75, 308.36],
+        },
+        mesh: [ // The 3D coordinates of each facial landmark.
+          [92.07, 119.49, -17.54],
+          [91.97, 102.52, -30.54],
+          ...
+        ],
+        scaledMesh: [ // The 3D coordinates of each facial landmark, normalized.
+          [322.32, 297.58, -17.54],
+          [322.18, 263.95, -30.54]
+        ],
+        annotations: { // Semantic groupings of the `scaledMesh` coordinates.
+          silhouette: [
+            [326.19, 124.72, -3.82],
+            [351.06, 126.30, -3.00],
+            ...
+          ],
+          ...
+        }
+      }
+    ]
+    */
+
+    for (let i = 0; i < predictions.length; i++) {
+      const keypoints = predictions[i].scaledMesh;
+
+      // Log facial keypoints.
+      for (let i = 0; i < keypoints.length; i++) {
+        const [x, y, z] = keypoints[i];
+
+        // console.log(`Keypoint ${i}: [${x}, ${y}, ${z}]`);
+        // plot points on a canvas
+      }
+    }
+  }
+}
 
 // check for device support
 if ('mediaDevices' in navigator && 'getUserMedia' in navigator.mediaDevices) {
@@ -28,6 +82,7 @@ navigator.mediaDevices.getUserMedia({
   video.srcObject = stream;
   streamStarted = true;
   console.log(stream, streamStarted)
+  main();
 }).catch( err => {
   console.log(err)
 });
