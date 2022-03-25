@@ -1,5 +1,4 @@
 const canvasSketch = require('canvas-sketch');
-const {random, math} = require('canvas-sketch-util');
 
 const video = document.querySelector('video');
 let streamStarted = false;
@@ -51,19 +50,6 @@ if (predictions.length > 0) {
     ]
     */
 
-    // const settings = {
-    //   dimensions: [ 1080, 1080 ],
-    // };
-
-    // for (let i = 0; i < predictions.length; i++) {
-    //   const keypoints = predictions[i].scaledMesh;
-
-    //   for (let i = 0; i < keypoints.length; i++) {
-    //   const [x, y, z] = keypoints[i];
-
-    //   // console.log(`Keypoint ${i}: [${x}, ${y}, ${z}]`);
-    // }
-
     // start canvas sketch
       const settings = {
         dimensions: [ 1080, 1080 ],
@@ -104,8 +90,6 @@ if (predictions.length > 0) {
         });
       };
     };
-      // Log facial keypoints.
-
       // plot points on a canvas
       canvasSketch(sketch, settings);
     }
