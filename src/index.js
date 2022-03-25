@@ -1,24 +1,8 @@
-// require('@tensorflow/tfjs-backend-webgl');
-// const faceLandmarksDetection = require('@tensorflow-models/face-landmarks-detection');
 const canvasSketch = require('canvas-sketch');
+const {random, math} = require('canvas-sketch-util');
+
 const video = document.querySelector('video');
 let streamStarted = false;
-
-// start canvas sketch
-
-const settings = {
-  dimensions: [ 1080, 1080 ],
-};
-
-const sketch = () => {
-  return ({ context, width, height }) => {
-    context.fillStyle = 'white';
-    context.fillRect(0, 0, width, height);
-  };
-};
-
-canvasSketch(sketch, settings);
-
 
 // check for device support
 if ('mediaDevices' in navigator && 'getUserMedia' in navigator.mediaDevices) {
@@ -27,6 +11,8 @@ if ('mediaDevices' in navigator && 'getUserMedia' in navigator.mediaDevices) {
 
 // get user permission and access Media Devices object
 async function generateMesh() {
+  console.log("tying again");
+
   const model = await faceLandmarksDetection.load(
       faceLandmarksDetection.SupportedPackages.mediapipeFacemesh);
   const predictions = await model.estimateFaces({
@@ -34,7 +20,6 @@ async function generateMesh() {
   });
 
 if (predictions.length > 0) {
-console.log(predictions)
     /*
     `predictions` is an array of objects describing each detected face, for example:
 
@@ -66,26 +51,113 @@ console.log(predictions)
     ]
     */
 
-    for (let i = 0; i < predictions.length; i++) {
-      const keypoints = predictions[i].scaledMesh;
+    // const settings = {
+    //   dimensions: [ 1080, 1080 ],
+    // };
 
-      // Log facial keypoints.
-      for (let i = 0; i < keypoints.length; i++) {
-        const [x, y, z] = keypoints[i];
+    // for (let i = 0; i < predictions.length; i++) {
+    //   const keypoints = predictions[i].scaledMesh;
 
-        console.log(`Keypoint ${i}: [${x}, ${y}, ${z}]`);
-        // plot points on a canvas
+    //   for (let i = 0; i < keypoints.length; i++) {
+    //   const [x, y, z] = keypoints[i];
+
+    //   // console.log(`Keypoint ${i}: [${x}, ${y}, ${z}]`);
+    // }
+
+    // start canvas sketch
+      const settings = {
+        dimensions: [ 1080, 1080 ],
+      };
+
+    const sketch = ({ context, width, height }) => {
+
+      const agents = [];
+
+      for (let i = 0; i < predictions.length; i++) {
+        const keypoints = predictions[i].scaledMesh;
+
+          for (let i = 0; i < keypoints.length; i++) {
+          const [x, y, z] = keypoints[i];
+
+          // console.log(`Keypoint ${i}: [${x}, ${y}, ${z}]`);
+          agents.push(new Agent(x, y, z))
+        }
       }
+
+      return ({ context, width, height }) => {
+        context.fillStyle = 'white';
+        context.fillRect(0, 0, width, height);
+
+        for (let i = 0; i < agents.length; i++) {
+          const agent = agents[i];
+
+            context.beginPath();
+            context.moveTo(agent.pos.x, agent.pos.y, agent.pos.z);
+            context.stroke();
+        }
+
+        console.log(agents)
+
+        agents.forEach(agent => {
+          agent.update();
+          agent.draw(context);
+        });
+      };
+    };
+      // Log facial keypoints.
+
+      // plot points on a canvas
+      canvasSketch(sketch, settings);
     }
+}
+
+class Vector {
+  constructor(x, y, z) {
+    this.x = x;
+    this.y = y;
+    this.z = z;
+  }
+}
+
+class Agent {
+  constructor(x, y, z) {
+    this.pos = new Vector(x, y, z);
+    this.radius = 1;
+  }
+
+  update() {
+    this.pos.x;
+    this.pos.y;
+    this.pos.z;
+  }
+
+  draw(context) {
+    context.save();
+    context.translate(this.pos.x, this.pos.y, this.pos.z);
+
+    context.lineWidth = 1;
+
+    context.beginPath();
+    context.arc(
+        0,
+        0,
+        this.radius,
+        0,
+        Math.PI * 2
+      );
+    context.fill();
+    context.stroke();
+
+    context.restore();
   }
 }
 
 navigator.mediaDevices.getUserMedia({
   video: {
     width: {
-      min: 1280,
-      ideal: 1920,
-      max: 2560,
+      min: 720,
+      ideal: 1080,
+      max: 1440
     },
     height: {
       min: 720,
@@ -99,7 +171,7 @@ navigator.mediaDevices.getUserMedia({
   video.srcObject = stream;
   streamStarted = true;
   console.log("stream", stream, "stream started", streamStarted)
-  generateMesh();
+  generateMesh()
 }).catch( err => {
   console.log(err)
 });
