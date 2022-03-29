@@ -22,20 +22,60 @@ function onResults(results) {
       results.image, 0, 0, canvasElement.width, canvasElement.height);
 
   canvasCtx.globalCompositeOperation = 'source-over';
-  drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS,
-                {color: '#000000', lineWidth: 1});
-  drawLandmarks(canvasCtx, results.poseLandmarks,
-                {color: '#000000', lineWidth: 1});
-  drawConnectors(canvasCtx, results.faceLandmarks, FACEMESH_TESSELATION,
-                {color: '#00000', lineWidth: 1});
-  drawConnectors(canvasCtx, results.leftHandLandmarks, HAND_CONNECTIONS,
-                {color: '#000000', lineWidth: 1});
-  drawLandmarks(canvasCtx, results.leftHandLandmarks,
-                {color: '#000000', lineWidth: 1});
-  drawConnectors(canvasCtx, results.rightHandLandmarks, HAND_CONNECTIONS,
-                {color: '#000000', lineWidth: 1});
-  drawLandmarks(canvasCtx, results.rightHandLandmarks,
-                {color: '#000000', lineWidth: 1});
+
+  // pose-connections
+  drawConnectors(
+    canvasCtx,
+    results.poseLandmarks,
+    POSE_CONNECTIONS,
+    {color: '#000000', lineWidth: 1}
+  );
+
+  // pose-landmarks
+  drawLandmarks(
+    canvasCtx,
+    results.poseLandmarks,
+    {color: '#000000', lineWidth: 1}
+  );
+
+  // facemesh tesselation
+  drawConnectors(
+    canvasCtx,
+    results.faceLandmarks,
+    FACEMESH_TESSELATION,
+    {color: '#00000', lineWidth: 1}
+  );
+
+  // left hand connections
+  drawConnectors(
+    canvasCtx,
+    results.leftHandLandmarks,
+    HAND_CONNECTIONS,
+    {color: '#000000', lineWidth: 1}
+  );
+
+  // left hand landmarks
+  drawLandmarks(
+    canvasCtx,
+    results.leftHandLandmarks,
+    {color: '#000000', lineWidth: 1}
+  );
+
+  // right hand connections
+  drawConnectors(
+    canvasCtx,
+    results.rightHandLandmarks,
+    HAND_CONNECTIONS,
+    {color: '#000000', lineWidth: 1}
+  );
+
+  // right hand landmarks
+  drawLandmarks(
+    canvasCtx,
+    results.rightHandLandmarks,
+    {color: '#000000', lineWidth: 1}
+  );
+
   canvasCtx.restore();
 }
 
