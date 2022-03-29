@@ -12,9 +12,13 @@ function onResults(results) {
   );
 
   // Only overwrite existing pixels.
-  canvasCtx.globalCompositeOperation = 'source-out';
+  canvasCtx.globalCompositeOperation = 'source-both';
   canvasCtx.fillStyle = '#FFFFFF';
   canvasCtx.fillRect(0, 0, canvasElement.width, canvasElement.height);
+
+  // canvasCtx.globalCompositeOperation = 'source-in';
+  // canvasCtx.fillStyle = '#FFFFFF';
+  // canvasCtx.fillRect(0, 0, canvasElement.width, canvasElement.height);
 
   // Only overwrite missing pixels.
   canvasCtx.globalCompositeOperation = 'destination-atop';
