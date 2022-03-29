@@ -16,10 +16,6 @@ function onResults(results) {
   canvasCtx.fillStyle = '#FFFFFF';
   canvasCtx.fillRect(0, 0, canvasElement.width, canvasElement.height);
 
-  // canvasCtx.globalCompositeOperation = 'source-in';
-  // canvasCtx.fillStyle = '#FFFFFF';
-  // canvasCtx.fillRect(0, 0, canvasElement.width, canvasElement.height);
-
   // Only overwrite missing pixels.
   canvasCtx.globalCompositeOperation = 'destination-atop';
   canvasCtx.drawImage(
