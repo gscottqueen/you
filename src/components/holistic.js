@@ -1,13 +1,14 @@
 
 import React, { useEffect, useRef } from 'react'
-import { Holistic } from "@mediapipe/holistic";
+import {
+  Holistic,
+  POSE_CONNECTIONS,
+  FACEMESH_TESSELATION,
+  HAND_CONNECTIONS } from "@mediapipe/holistic";
 import { Camera } from "@mediapipe/camera_utils";
 import {
   drawConnectors,
-  drawLandmarks,
-  POSE_CONNECTIONS,
-  FACEMESH_TESSELATION,
-  HAND_CONNECTIONS
+  drawLandmarks
 } from "@mediapipe/drawing_utils";
 
 const Runner = () => {
