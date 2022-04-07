@@ -118,8 +118,8 @@ useEffect(() => {
     onFrame: async () => {
       await holistic.send({image: video});
     },
-    width: 1280,
-    height: 3000
+    width: 1080,
+    height: 1080
   });
 
   camera.start();
