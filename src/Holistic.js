@@ -34,82 +34,88 @@ useEffect(() => {
   });
 
   function onResults(results, canvasCtx = context) {
-    console.log('in component', results, canvasCtx)
-    canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
-    canvasCtx.save();
-    canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-    canvasCtx.drawImage(
-      results.segmentationMask, 0, 0,
-      canvasElement.width,
-      canvasElement.height
-    );
 
-    // Only overwrite existing pixels.
-    canvasCtx.globalCompositeOperation = 'source-both';
-    canvasCtx.fillStyle = '#FFFFFF';
-    canvasCtx.fillRect(0, 0, canvasElement.width, canvasElement.height);
 
-    // Only overwrite missing pixels.
-    canvasCtx.globalCompositeOperation = 'destination-atop';
-    canvasCtx.drawImage(
-        results.image, 0, 0, canvasElement.width, canvasElement.height);
+    if (results.ea) {
+      console.log('in component', results, canvasCtx)
+      canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
+      canvasCtx.save();
+      canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+      canvasCtx.drawImage(
+        results.segmentationMask, 0, 0,
+        canvasElement.width,
+        canvasElement.height
+      );
 
-    canvasCtx.globalCompositeOperation = 'source-over';
+      // Only overwrite existing pixels.
+      canvasCtx.globalCompositeOperation = 'source-both';
+      canvasCtx.fillStyle = '#FFFFFF';
+      canvasCtx.fillRect(0, 0, canvasElement.width, canvasElement.height);
 
-    // pose-connections
-    drawConnectors(
-      canvasCtx,
-      results.poseLandmarks,
-      POSE_CONNECTIONS,
-      {color: '#000000', lineWidth: 1}
-    );
+      // Only overwrite missing pixels.
+      canvasCtx.globalCompositeOperation = 'destination-atop';
+      canvasCtx.drawImage(
+          results.image, 0, 0, canvasElement.width, canvasElement.height);
 
-    // pose-landmarks
-    drawLandmarks(
-      canvasCtx,
-      results.poseLandmarks,
-      {color: '#000000', lineWidth: 1}
-    );
+      canvasCtx.globalCompositeOperation = 'source-over';
 
-    // facemesh tesselation
-    drawConnectors(
-      canvasCtx,
-      results.faceLandmarks,
-      FACEMESH_TESSELATION,
-      {color: '#00000', lineWidth: 1}
-    );
+      // pose-connections
+      drawConnectors(
+        canvasCtx,
+        results.poseLandmarks,
+        POSE_CONNECTIONS,
+        {color: '#000000', lineWidth: 1}
+      );
 
-    // left hand connections
-    drawConnectors(
-      canvasCtx,
-      results.leftHandLandmarks,
-      HAND_CONNECTIONS,
-      {color: '#000000', lineWidth: 1}
-    );
+      // pose-landmarks
+      drawLandmarks(
+        canvasCtx,
+        results.poseLandmarks,
+        {color: '#000000', lineWidth: 1}
+      );
 
-    // left hand landmarks
-    drawLandmarks(
-      canvasCtx,
-      results.leftHandLandmarks,
-      {color: '#000000', lineWidth: 1}
-    );
+      // facemesh tesselation
+      drawConnectors(
+        canvasCtx,
+        results.faceLandmarks,
+        FACEMESH_TESSELATION,
+        {color: '#00000', lineWidth: 1}
+      );
 
-    // right hand connections
-    drawConnectors(
-      canvasCtx,
-      results.rightHandLandmarks,
-      HAND_CONNECTIONS,
-      {color: '#000000', lineWidth: 1}
-    );
+      // left hand connections
+      drawConnectors(
+        canvasCtx,
+        results.leftHandLandmarks,
+        HAND_CONNECTIONS,
+        {color: '#000000', lineWidth: 1}
+      );
 
-    // right hand landmarks
-    drawLandmarks(
-      canvasCtx,
-      results.rightHandLandmarks,
-      {color: '#000000', lineWidth: 1}
-    );
+      // left hand landmarks
+      drawLandmarks(
+        canvasCtx,
+        results.leftHandLandmarks,
+        {color: '#000000', lineWidth: 1}
+      );
 
-    canvasCtx.restore();
+      // right hand connections
+      drawConnectors(
+        canvasCtx,
+        results.rightHandLandmarks,
+        HAND_CONNECTIONS,
+        {color: '#000000', lineWidth: 1}
+      );
+
+      // right hand landmarks
+      drawLandmarks(
+        canvasCtx,
+        results.rightHandLandmarks,
+        {color: '#000000', lineWidth: 1}
+      );
+
+      canvasCtx.restore();
+    } else {
+      canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
+    }
   }
 
   holistic.onResults(onResults)
