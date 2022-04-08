@@ -35,9 +35,7 @@ useEffect(() => {
 
   function onResults(results, canvasCtx = context) {
 
-
     if (results.ea) {
-      console.log('in component', results, canvasCtx)
       canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
       canvasCtx.save();
       canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
