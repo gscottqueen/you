@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef } from 'react'
 import {
   Holistic,
@@ -11,13 +10,18 @@ import {
   drawLandmarks
 } from "@mediapipe/drawing_utils";
 
+import PatternBlock from './test-pattern/1062.jpg'
+
 const Runner = () => {
 const videoElement = useRef(null);
 const canvasElement = useRef(null);
+const patternElement = useRef(null);
 
 useEffect(() => {
   const video = videoElement.current
   const canvas = canvasElement.current
+  const pattern = patternElement.current
+
   const context = canvas.getContext('2d')
   const holistic = new Holistic({locateFile: (file) => {
     return `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${file}`;
@@ -25,6 +29,7 @@ useEffect(() => {
 
   holistic.setOptions({
     modelComplexity: 1,
+    modelSelection: 1,
     smoothLandmarks: true,
     enableSegmentation: true,
     smoothSegmentation: true,
@@ -33,83 +38,58 @@ useEffect(() => {
     minTrackingConfidence: 0.5
   });
 
+const outsideContour = [
+  127, 162, 21, 54, 103, 67, 109, 10, 338, 297, 332, 284, 251, 389, 356, 454, 323, 361, 288, 397, 365, 379, 378, 400, 377, 152, 148, 176, 149, 150, 136, 172, 58, 132, 93, 234
+]
+
+console.log(outsideContour.length / 2)
+
+
+
+  const band = [
+    132, 177, 147, 197, 305, 36, 142, 209, 198, 236, 3, 195, 248, 456, 420, 429, 371, 266, 425, 411, 376, 401, 361
+  ]
+
+  const randomNumber = (min, max) => Math.random() * (max - min) + min
+
+  const drawContours = (context, results, width, height ) => {
+    const bodyCoordinates = document.body.getBoundingClientRect()
+
+    context.lineWidth = 1;
+    context.strokeStyle = 'black';
+    context.beginPath();
+    // context.moveTo(bodyCoordinates.left,bodyCoordinates.top)
+    console.log(bodyCoordinates)
+    context.moveTo(
+      bodyCoordinates.left,
+      randomNumber(bodyCoordinates.top,bodyCoordinates.bottom)
+    )
+
+    for (let i = 0; i < band.length; i++) {
+
+      for (let j = 0; j < results.faceLandmarks.length; j++) {
+        if (j === band[i]) {
+          const x = results.faceLandmarks[j].x * width
+          const y = results.faceLandmarks[j].y * height
+          // context.drawImage(pattern, x, y)
+          context.lineTo(x, y);
+        }
+      }
+    }
+    context.lineTo(
+      bodyCoordinates.right,
+      randomNumber(bodyCoordinates.top,bodyCoordinates.bottom)
+    )
+    context.stroke();
+};
+
   function onResults(results, canvasCtx = context) {
 
     if (results.ea) {
       canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
       canvasCtx.save();
-      canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-      canvasCtx.drawImage(
-        results.segmentationMask, 0, 0,
-        canvasElement.width,
-        canvasElement.height
-      );
-
-      // Only overwrite existing pixels.
-      canvasCtx.globalCompositeOperation = 'source-both';
-      canvasCtx.fillStyle = '#FFFFFF';
-      canvasCtx.fillRect(0, 0, canvasElement.width, canvasElement.height);
-
-      // Only overwrite missing pixels.
-      canvasCtx.globalCompositeOperation = 'destination-atop';
-      canvasCtx.drawImage(
-          results.image, 0, 0, canvasElement.width, canvasElement.height);
-
       canvasCtx.globalCompositeOperation = 'source-over';
-
-      // pose-connections
-      drawConnectors(
-        canvasCtx,
-        results.poseLandmarks,
-        POSE_CONNECTIONS,
-        {color: '#000000', lineWidth: 1}
-      );
-
-      // pose-landmarks
-      drawLandmarks(
-        canvasCtx,
-        results.poseLandmarks,
-        {color: '#000000', lineWidth: 1}
-      );
-
-      // facemesh tesselation
-      drawConnectors(
-        canvasCtx,
-        results.faceLandmarks,
-        FACEMESH_TESSELATION,
-        {color: '#00000', lineWidth: 1}
-      );
-
-      // left hand connections
-      drawConnectors(
-        canvasCtx,
-        results.leftHandLandmarks,
-        HAND_CONNECTIONS,
-        {color: '#000000', lineWidth: 1}
-      );
-
-      // left hand landmarks
-      drawLandmarks(
-        canvasCtx,
-        results.leftHandLandmarks,
-        {color: '#000000', lineWidth: 1}
-      );
-
-      // right hand connections
-      drawConnectors(
-        canvasCtx,
-        results.rightHandLandmarks,
-        HAND_CONNECTIONS,
-        {color: '#000000', lineWidth: 1}
-      );
-
-      // right hand landmarks
-      drawLandmarks(
-        canvasCtx,
-        results.rightHandLandmarks,
-        {color: '#000000', lineWidth: 1}
-      );
-
+      drawContours(canvasCtx, results, canvas.width, canvas.height)
       canvasCtx.restore();
     } else {
       canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
@@ -129,10 +109,17 @@ useEffect(() => {
   camera.start();
 })
 
+  const PatternElement = ({src, patternRef, hidden}) => <img src={src} ref={patternRef} alt="" hidden={hidden}></img>
+
   return (
     <div className="container">
       <video className="input_video" hidden ref={videoElement}></video>
-      <canvas className="output_canvas" width="1080px" height="1080px" style={{width: '100vw', height: '100vh'}} ref={canvasElement}></canvas>
+      <canvas
+        className="output_canvas"
+        width="1080px" height="1080px"
+        style={{width: '100vw', height: '100vh'}}
+        ref={canvasElement}></canvas>
+      <PatternElement src={PatternBlock} patternRef={patternElement} hidden/>
     </div>
   )
 
