@@ -47,7 +47,7 @@ console.log(outsideContour.length / 2)
 
 
   const band = [
-    132, 177, 147, 197, 305, 36, 142, 209, 198, 236, 3, 195, 248, 456, 420, 429, 371, 266, 425, 411, 376, 401, 361
+    132, 177, 147, 187, 205, 36, 142, 209, 198, 236, 3, 195, 248, 456, 420, 429, 371, 266, 425, 411, 376, 401, 361
   ]
 
   const randomNumber = (min, max) => Math.random() * (max - min) + min
@@ -58,7 +58,6 @@ console.log(outsideContour.length / 2)
     context.lineWidth = 1;
     context.strokeStyle = 'black';
     context.beginPath();
-    // context.moveTo(bodyCoordinates.left,bodyCoordinates.top)
     console.log(bodyCoordinates)
     context.moveTo(
       bodyCoordinates.left,
@@ -71,7 +70,6 @@ console.log(outsideContour.length / 2)
         if (j === band[i]) {
           const x = results.faceLandmarks[j].x * width
           const y = results.faceLandmarks[j].y * height
-          // context.drawImage(pattern, x, y)
           context.lineTo(x, y);
         }
       }
@@ -89,7 +87,9 @@ console.log(outsideContour.length / 2)
       canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
       canvasCtx.save();
       canvasCtx.globalCompositeOperation = 'source-over';
-      drawContours(canvasCtx, results, canvas.width, canvas.height)
+      for (let i = 0; i < outsideContour.length / 2; i++ ) {
+        drawContours(canvasCtx, results, canvas.width, canvas.height)
+      }
       canvasCtx.restore();
     } else {
       canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
