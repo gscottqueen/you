@@ -1,26 +1,14 @@
 import React, { useEffect, useRef } from 'react'
-import {
-  Holistic,
-  POSE_CONNECTIONS,
-  FACEMESH_TESSELATION,
-  HAND_CONNECTIONS } from "@mediapipe/holistic";
+import { Holistic } from "@mediapipe/holistic";
 import { Camera } from "@mediapipe/camera_utils";
-import {
-  drawConnectors,
-  drawLandmarks
-} from "@mediapipe/drawing_utils";
-
-import PatternBlock from './test-pattern/1062.jpg'
 
 const Runner = () => {
 const videoElement = useRef(null);
 const canvasElement = useRef(null);
-const patternElement = useRef(null);
 
 useEffect(() => {
   const video = videoElement.current
   const canvas = canvasElement.current
-  const pattern = patternElement.current
 
   const context = canvas.getContext('2d')
   const holistic = new Holistic({locateFile: (file) => {
@@ -51,15 +39,15 @@ console.log(outsideContour.length / 2)
     132, 177, 147, 187, 205, 36, 142, 209, 198, 236, 3, 195, 248, 456, 420, 429, 371, 266, 425, 411, 376, 401, 361
   ]
 
-  const outsideCoordinate = ( min, max, fraction) => {
-    return min + max / fraction
+  const outsideCoordinate = ( height, fraction) => {
+    return height / fraction
   }
-
-  // const randomNumber = (min, max) => Math.random() * (max - min) + min
 
   const bodyCoordinates = document.body.getBoundingClientRect()
 
   const drawContours = (context, results, width, height, outside) => {
+
+    console.log(outside)
 
     context.lineWidth = 1;
     context.strokeStyle = 'black';
@@ -86,7 +74,6 @@ console.log(outsideContour.length / 2)
     if (results.ea) {
       canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
       canvasCtx.save();
-      canvasCtx.globalCompositeOperation = 'source-over';
 
   // get coordinates from left, top - bottom, in fractions of array.length / 2
 
@@ -96,16 +83,20 @@ console.log(outsideContour.length / 2)
         bodyCoordinates.bottom,
         outsideContour.length / 2))
 
-      for (let i = 0; i < outsideContour.length / 2; i++ ) {
-        let outside = outsideCoordinate(
-        bodyCoordinates.top,
-        bodyCoordinates.bottom,
-        outsideContour.length / 2)
 
-        drawContours(canvasCtx, results, canvas.width, canvas.height, outside)
+      if (results.length > 0) {
+        for (let i = 0; i < outsideContour.length / 2; i++ ) {
+          let outside = outsideCoordinate(
+          bodyCoordinates.height,
+          outsideContour.length / 2)
+
+          drawContours(canvasCtx, results, canvas.width, canvas.height, outside)
+        }
       }
+
       canvasCtx.restore();
     } else {
+      console.log('no length')
       canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
     }
   }
@@ -123,8 +114,6 @@ console.log(outsideContour.length / 2)
   camera.start();
 })
 
-  const PatternElement = ({src, patternRef, hidden}) => <img src={src} ref={patternRef} alt="" hidden={hidden}></img>
-
   return (
     <div className="container">
       <video className="input_video" hidden ref={videoElement}></video>
@@ -133,7 +122,6 @@ console.log(outsideContour.length / 2)
         width="1080px" height="1080px"
         style={{width: '100vw', height: '100vh'}}
         ref={canvasElement}></canvas>
-      <PatternElement src={PatternBlock} patternRef={patternElement} hidden/>
     </div>
   )
 
