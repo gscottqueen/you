@@ -27,40 +27,31 @@ useEffect(() => {
     minTrackingConfidence: 0.5
   });
 
-const outsideContour = [
-  127, 162, 21, 54, 103, 67, 109, 10, 338, 297, 332, 284, 251, 389, 356, 454, 323, 361, 288, 397, 365, 379, 378, 400, 377, 152, 148, 176, 149, 150, 136, 172, 58, 132, 93, 234
-]
-
-console.log(outsideContour.length / 2)
-
-
+  const outsideContour = [
+    127, 162, 21, 54, 103, 67, 109, 10, 338, 297, 332, 284, 251, 389, 356, 454, 323, 361, 288, 397, 365, 379, 378, 400, 377, 152, 148, 176, 149, 150, 136, 172, 58, 132, 93, 234
+  ]
 
   const band = [
     132, 177, 147, 187, 205, 36, 142, 209, 198, 236, 3, 195, 248, 456, 420, 429, 371, 266, 425, 411, 376, 401, 361
   ]
 
-  const outsideCoordinate = ( height, fraction) => {
-    return height / fraction
-  }
+  const outsideCoordinate = (height, fraction) => height / fraction
 
-  const bodyCoordinates = document.body.getBoundingClientRect()
+  const bodyCoordinates = canvas.getBoundingClientRect()
 
-  const drawContours = (context, results, width, height, outside) => {
-
-    console.log(outside)
+  const drawContours = (context, results, canvas, outside) => {
 
     context.lineWidth = 1;
     context.strokeStyle = 'black';
     context.beginPath();
-    console.log(bodyCoordinates)
     context.moveTo(bodyCoordinates.left, outside)
 
-    for (let i = 0; i < band.length; i++) {
 
+    for (let i = 0; i < band.length; i++) {
       for (let j = 0; j < results.faceLandmarks.length; j++) {
         if (j === band[i]) {
-          const x = results.faceLandmarks[j].x * width
-          const y = results.faceLandmarks[j].y * height
+          const x = results.faceLandmarks[j].x * canvas.width
+          const y = results.faceLandmarks[j].y * canvas.height
           context.lineTo(x, y);
         }
       }
@@ -75,24 +66,13 @@ console.log(outsideContour.length / 2)
       canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
       canvasCtx.save();
 
-  // get coordinates from left, top - bottom, in fractions of array.length / 2
+      // get coordinates from left, top - bottom, in fractions of array.length / 2
+      let outside = 0;
 
-      console.log(
-      outsideCoordinate(
-        bodyCoordinates.top,
-        bodyCoordinates.bottom,
-        outsideContour.length / 2))
-
-
-      if (results.length > 0) {
         for (let i = 0; i < outsideContour.length / 2; i++ ) {
-          let outside = outsideCoordinate(
-          bodyCoordinates.height,
-          outsideContour.length / 2)
-
-          drawContours(canvasCtx, results, canvas.width, canvas.height, outside)
+          outside = outside + outsideCoordinate(bodyCoordinates.height, outsideContour.length / 2)
+          drawContours(canvasCtx, results, canvas, outside)
         }
-      }
 
       canvasCtx.restore();
     } else {
@@ -107,20 +87,19 @@ console.log(outsideContour.length / 2)
     onFrame: async () => {
       await holistic.send({image: video});
     },
-    width: 1080,
-    height: 1080
+    width: canvas.width,
+    height: canvas.height
   });
 
-  camera.start();
-})
+    camera.start();
+  })
 
   return (
-    <div className="container">
+    window && <div className="container">
       <video className="input_video" hidden ref={videoElement}></video>
       <canvas
         className="output_canvas"
-        width="1080px" height="1080px"
-        style={{width: '100vw', height: '100vh'}}
+        width={`${window.innerWidth}px`} height={`${window.innerHeight}px`}
         ref={canvasElement}></canvas>
     </div>
   )
