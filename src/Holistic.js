@@ -31,6 +31,7 @@ useEffect(() => {
     modelComplexity: 1,
     modelSelection: 1,
     smoothLandmarks: true,
+    selfieMode: true,
     enableSegmentation: true,
     smoothSegmentation: true,
     refineFaceLandmarks: true,
@@ -50,19 +51,21 @@ console.log(outsideContour.length / 2)
     132, 177, 147, 187, 205, 36, 142, 209, 198, 236, 3, 195, 248, 456, 420, 429, 371, 266, 425, 411, 376, 401, 361
   ]
 
-  const randomNumber = (min, max) => Math.random() * (max - min) + min
+  const outsideCoordinate = ( min, max, fraction) => {
+    return min + max / fraction
+  }
 
-  const drawContours = (context, results, width, height ) => {
-    const bodyCoordinates = document.body.getBoundingClientRect()
+  // const randomNumber = (min, max) => Math.random() * (max - min) + min
+
+  const bodyCoordinates = document.body.getBoundingClientRect()
+
+  const drawContours = (context, results, width, height, outside) => {
 
     context.lineWidth = 1;
     context.strokeStyle = 'black';
     context.beginPath();
     console.log(bodyCoordinates)
-    context.moveTo(
-      bodyCoordinates.left,
-      randomNumber(bodyCoordinates.top,bodyCoordinates.bottom)
-    )
+    context.moveTo(bodyCoordinates.left, outside)
 
     for (let i = 0; i < band.length; i++) {
 
@@ -74,10 +77,7 @@ console.log(outsideContour.length / 2)
         }
       }
     }
-    context.lineTo(
-      bodyCoordinates.right,
-      randomNumber(bodyCoordinates.top,bodyCoordinates.bottom)
-    )
+    context.lineTo(bodyCoordinates.right, outside)
     context.stroke();
 };
 
@@ -87,8 +87,22 @@ console.log(outsideContour.length / 2)
       canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
       canvasCtx.save();
       canvasCtx.globalCompositeOperation = 'source-over';
+
+  // get coordinates from left, top - bottom, in fractions of array.length / 2
+
+      console.log(
+      outsideCoordinate(
+        bodyCoordinates.top,
+        bodyCoordinates.bottom,
+        outsideContour.length / 2))
+
       for (let i = 0; i < outsideContour.length / 2; i++ ) {
-        drawContours(canvasCtx, results, canvas.width, canvas.height)
+        let outside = outsideCoordinate(
+        bodyCoordinates.top,
+        bodyCoordinates.bottom,
+        outsideContour.length / 2)
+
+        drawContours(canvasCtx, results, canvas.width, canvas.height, outside)
       }
       canvasCtx.restore();
     } else {

@@ -1,5 +1,6 @@
 import Runner from './Holistic'
 import TestSupport from './mobile-detection'
+import './app.css'
 
 function App() {
   TestSupport()
