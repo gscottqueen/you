@@ -7,6 +7,9 @@ const {
   outsideCoordinates,
   band10,
   band109,
+  band67,
+  band103,
+  band54,
   band93,
   band132
 } = CORDINATES
@@ -22,6 +25,9 @@ const Runner = () => {
     const bands = [
       band10,
       band109,
+      band67,
+      band103,
+      band54,
       band93,
       band132
     ]
@@ -47,6 +53,7 @@ const Runner = () => {
       context.lineWidth = 1;
       context.strokeStyle = 'black';
 
+      // TODO: clean up single character props
       const drawLandMarkConnections = (r, index) => {
         for (let l = 0; l < r.faceLandmarks.length; l++) {
           if (l === index) {
@@ -66,7 +73,9 @@ const Runner = () => {
       for (let j = 0; j < band.length; j++) {
         context.beginPath()
         context.moveTo(bodyCoordinates.left, outside)
-        drawBand(band, results)
+          if (results?.faceLandmarks) {
+            drawBand(band, results)
+          }
         context.lineTo(bodyCoordinates.right, outside)
         context.stroke();
         context.save()
@@ -74,21 +83,15 @@ const Runner = () => {
     };
 
     function onResults(results, canvasCtx = context) {
-      if (results.ea) {
-        canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
-        canvasCtx.save();
-        let outside = 0;
+      canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
+      canvasCtx.save();
+      let outside = 0;
 
-          for (let i = 0; i < bands.length; i++ ) {
-            outside = outside + outsideCoordinate(bodyCoordinates.height, outsideCoordinates.length / 2)
-            drawHorizontalContours(canvasCtx, results, bands[i], canvas, outside, i)
-          }
-
-        canvasCtx.restore();
-      } else {
-        console.log('no length')
-        canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
-      }
+        for (let i = 0; i < bands.length; i++ ) {
+          outside = outside + outsideCoordinate(bodyCoordinates.height, outsideCoordinates.length / 2)
+          drawHorizontalContours(canvasCtx, results, bands[i], canvas, outside, i)
+        }
+      canvasCtx.restore();
     }
 
     holistic.onResults(onResults)
@@ -112,7 +115,6 @@ const Runner = () => {
         ref={canvasElement}></canvas>
     </div>
   )
-
 }
 
 export default Runner
