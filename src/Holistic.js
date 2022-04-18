@@ -70,27 +70,24 @@ const Runner = () => {
         }
       }
 
-      for (let j = 0; j < band.length; j++) {
-        context.beginPath()
-        context.moveTo(bodyCoordinates.left, outside)
-          if (results?.faceLandmarks) {
-            drawBand(band, results)
-          }
-        context.lineTo(bodyCoordinates.right, outside)
-        context.stroke();
-        context.save()
+      context.beginPath()
+      context.moveTo(bodyCoordinates.left, outside)
+      if (results?.faceLandmarks) {
+        drawBand(band, results)
       }
+      context.lineTo(bodyCoordinates.right, outside)
+      context.stroke();
     };
 
     function onResults(results, canvasCtx = context) {
       canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
-      canvasCtx.save();
       let outside = 0;
 
         for (let i = 0; i < bands.length; i++ ) {
-          outside = outside + outsideCoordinate(bodyCoordinates.height, outsideCoordinates.length / 2)
+          outside = outside + outsideCoordinate(bodyCoordinates.height, outsideCoordinates.length)
           drawHorizontalContours(canvasCtx, results, bands[i], canvas, outside, i)
         }
+      canvasCtx.save();
       canvasCtx.restore();
     }
 
