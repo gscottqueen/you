@@ -6,12 +6,12 @@ import * as CORDINATES from './coordinates'
 const {
   outsideCoordinates,
   band10,
-  band109,
-  band67,
-  band103,
-  band54,
-  band93,
-  band132
+  // band109,
+  // band67,
+  // band103,
+  // band54,
+  // band93,
+  // band132
 } = CORDINATES
 
 const Runner = () => {
@@ -24,12 +24,12 @@ const Runner = () => {
     const context = canvas.getContext('2d')
     const bands = [
       band10,
-      band109,
-      band67,
-      band103,
-      band54,
-      band93,
-      band132
+      // band109,
+      // band67,
+      // band103,
+      // band54,
+      // band93,
+      // band132
     ]
     const outsideCoordinate = (size, fraction) => size / fraction
     const bodyCoordinates = canvas.getBoundingClientRect()
@@ -49,44 +49,45 @@ const Runner = () => {
       minTrackingConfidence: 0.5
     });
 
-    const drawHorizontalContours = (context, results, band, canvas, outside) => {
-      context.lineWidth = 1;
-      context.strokeStyle = 'black';
-
-      // TODO: clean up single character props
-      const drawLandMarkConnections = (r, index) => {
-        for (let l = 0; l < r.faceLandmarks.length; l++) {
-          if (l === index) {
-            const x = r.faceLandmarks[l].x * canvas.width
-            const y = r.faceLandmarks[l].y * canvas.height
-            context.lineTo(x, y);
-          }
+    const drawLandMarkConnections = (results, index, canvas) => {
+      for (let i = 0; i < results.length; i++) {
+        if (i === index) {
+          const x = results[i].x * canvas.width
+          const y = results[i].y * canvas.height
+          context.lineTo(x, y);
         }
       }
+    }
 
-      const drawBand = (b, r) => {
-        for (let l = 0; l < b.length; l++) {
-          drawLandMarkConnections(r, b[l])
+    const drawHorizontalContours = (context, results, band, canvas, outside) => {
+
+      const drawBand = (resultsArray, bandArray) => {
+        for (let l = 0; l < bandArray.length; l++) {
+          drawLandMarkConnections(resultsArray, bandArray[l], canvas)
         }
       }
 
       context.beginPath()
       context.moveTo(bodyCoordinates.left, outside)
+
       if (results?.faceLandmarks) {
-        drawBand(band, results)
+        drawBand(results.faceLandmarks, band)
       }
+
       context.lineTo(bodyCoordinates.right, outside)
       context.stroke();
     };
 
     function onResults(results, canvasCtx = context) {
+      context.lineWidth = 1;
+      context.strokeStyle = 'black';
       canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
       let outside = 0;
 
-        for (let i = 0; i < bands.length; i++ ) {
-          outside = outside + outsideCoordinate(bodyCoordinates.height, outsideCoordinates.length)
-          drawHorizontalContours(canvasCtx, results, bands[i], canvas, outside, i)
-        }
+      for (let i = 0; i < bands.length; i++ ) {
+        outside = outside + outsideCoordinate(bodyCoordinates.height, outsideCoordinates.length)
+        drawHorizontalContours(canvasCtx, results, bands[i], canvas, outside, i)
+      }
       canvasCtx.save();
       canvasCtx.restore();
     }
