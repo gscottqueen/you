@@ -4,14 +4,13 @@ import { Camera } from "@mediapipe/camera_utils";
 import * as CORDINATES from './coordinates'
 
 const {
-  outsideCoordinates,
-  band10,
-  // band109,
-  // band67,
-  // band103,
-  // band54,
-  // band93,
-  // band132
+  // band10,
+  band109,
+  band67,
+  band103,
+  band54,
+  band93,
+  band132
 } = CORDINATES
 
 const Runner = () => {
@@ -22,16 +21,17 @@ const Runner = () => {
     const video = videoElement.current
     const canvas = canvasElement.current
     const context = canvas.getContext('2d')
+    context.lineWidth = 1;
+    context.strokeStyle = 'black';
+    context.save();
     const bands = [
-      band10,
-      // band109,
-      // band67,
-      // band103,
-      // band54,
-      // band93,
-      // band132
+      band109,
+      band67,
+      band103,
+      band54,
+      band93,
+      band132
     ]
-    const outsideCoordinate = (size, fraction) => size / fraction
     const bodyCoordinates = canvas.getBoundingClientRect()
     const holistic = new Holistic({locateFile: (file) => {
       return `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${file}`;
@@ -50,45 +50,40 @@ const Runner = () => {
     });
 
     const drawLandMarkConnections = (results, index, canvas) => {
-      for (let i = 0; i < results.length; i++) {
-        if (i === index) {
-          const x = results[i].x * canvas.width
-          const y = results[i].y * canvas.height
-          context.lineTo(x, y);
-        }
-      }
+      const x = results[index].x * canvas.width
+      const y = results[index].y * canvas.height
+      context.lineTo(x, y);
     }
 
-    const drawHorizontalContours = (context, results, band, canvas, outside) => {
+    const drawBandContours = (context, results, band, canvas, outside) => {
 
       const drawBand = (resultsArray, bandArray) => {
-        for (let l = 0; l < bandArray.length; l++) {
-          drawLandMarkConnections(resultsArray, bandArray[l], canvas)
+        for (let j = 0; j < bandArray.length; j++) {
+          drawLandMarkConnections(resultsArray, bandArray[j], canvas)
         }
       }
 
-      context.beginPath()
-      context.moveTo(bodyCoordinates.left, outside)
+      const outsideY = results.faceLandmarks
+        ? results.faceLandmarks[band[0]].y * canvas.height
+        : outside
 
+      context.beginPath()
+      context.moveTo(bodyCoordinates.left, outsideY)
       if (results?.faceLandmarks) {
         drawBand(results.faceLandmarks, band)
       }
-
-      context.lineTo(bodyCoordinates.right, outside)
+      context.lineTo(bodyCoordinates.right, outsideY)
       context.stroke();
     };
 
     function onResults(results, canvasCtx = context) {
-      context.lineWidth = 1;
-      context.strokeStyle = 'black';
       canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
       let outside = 0;
 
       for (let i = 0; i < bands.length; i++ ) {
-        outside = outside + outsideCoordinate(bodyCoordinates.height, outsideCoordinates.length)
-        drawHorizontalContours(canvasCtx, results, bands[i], canvas, outside, i)
+        outside = outside + ( bodyCoordinates.height / bands.length )
+        drawBandContours(canvasCtx, results, bands[i], canvas, outside)
       }
-      canvasCtx.save();
       canvasCtx.restore();
     }
 
