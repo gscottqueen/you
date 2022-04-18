@@ -3,15 +3,7 @@ import { Holistic } from "@mediapipe/holistic";
 import { Camera } from "@mediapipe/camera_utils";
 import * as CORDINATES from './coordinates'
 
-const {
-  // band10,
-  band109,
-  band67,
-  band103,
-  band54,
-  band93,
-  band132
-} = CORDINATES
+const { bands } = CORDINATES
 
 const Runner = () => {
   const videoElement = useRef(null);
@@ -24,14 +16,6 @@ const Runner = () => {
     context.lineWidth = 1;
     context.strokeStyle = 'black';
     context.save();
-    const bands = [
-      band109,
-      band67,
-      band103,
-      band54,
-      band93,
-      band132
-    ]
     const bodyCoordinates = canvas.getBoundingClientRect()
     const holistic = new Holistic({locateFile: (file) => {
       return `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${file}`;
@@ -63,28 +47,63 @@ const Runner = () => {
         }
       }
 
-      const outsideY = results.faceLandmarks
-        ? results.faceLandmarks[band[0]].y * canvas.height
-        : outside
-
-      context.beginPath()
-      context.moveTo(bodyCoordinates.left, outsideY)
+      context.moveTo(bodyCoordinates.left, outside)
       if (results?.faceLandmarks) {
         drawBand(results.faceLandmarks, band)
       }
-      context.lineTo(bodyCoordinates.right, outsideY)
-      context.stroke();
+      context.lineTo(bodyCoordinates.right, outside)
     };
+
+    const drawFill = (length, band, side) => {
+
+      let spacing = 0;
+      const outsideCoordinate = side === 'bottom' ? bodyCoordinates.bottom : bodyCoordinates.top
+      console.log(outsideCoordinate)
+
+      for (let j = 0; j < length; j++) {
+        spacing = spacing + ( bodyCoordinates.width / length )
+        context.moveTo(
+          spacing,
+          outsideCoordinate
+          )
+        context.lineTo(
+          band.x * canvas.width,
+          band.y * canvas.height
+        );
+      }
+    }
 
     function onResults(results, canvasCtx = context) {
       canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
+      canvasCtx.beginPath()
+
+      drawFill(
+        bands.length * 2,
+        results.faceLandmarks[bands[0]],
+        'top'
+      )
+
       let outside = 0;
 
       for (let i = 0; i < bands.length; i++ ) {
         outside = outside + ( bodyCoordinates.height / bands.length )
-        drawBandContours(canvasCtx, results, bands[i], canvas, outside)
+
+        drawBandContours(
+          canvasCtx,
+          results,
+          bands[i],
+          canvas,
+          outside
+        )
       }
-      canvasCtx.restore();
+
+      drawFill(
+        bands.length * 2,
+        results.faceLandmarks[bands[bands.length - 1]],
+        'bottom'
+      )
+
+      canvasCtx.stroke();
     }
 
     holistic.onResults(onResults)
