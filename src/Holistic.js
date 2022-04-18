@@ -57,8 +57,9 @@ const Runner = () => {
     const drawFill = (length, band, side) => {
 
       let spacing = 0;
-      const outsideCoordinate = side === 'bottom' ? bodyCoordinates.bottom : bodyCoordinates.top
-      console.log(outsideCoordinate)
+      const outsideCoordinate = side === 'bottom'
+        ? bodyCoordinates.bottom
+        : bodyCoordinates.top
 
       for (let j = 0; j < length; j++) {
         spacing = spacing + ( bodyCoordinates.width / length )
